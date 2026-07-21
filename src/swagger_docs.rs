@@ -17,8 +17,8 @@ use utoipa::OpenApi;
 #[openapi(
     paths(
         crate::api::version::version,
-        // crate::api::public_key::public_key,
-        // crate::api::verifying_key::verifying_key,
+        crate::api::public_key::public_key,
+        crate::api::verifying_key::verifying_key,
     ),
     servers(
         (url = "/api/v1", description = "Api v1")

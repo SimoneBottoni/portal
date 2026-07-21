@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use anyhow::Context;
+use axum::extract::FromRef;
 use axum::http::StatusCode;
 use axum::{Router, routing::get};
 
@@ -13,6 +14,8 @@ use tower_http::timeout::TimeoutLayer;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
 
+use crate::api::public_key::public_key;
+use crate::api::verifying_key::verifying_key;
 use crate::api::version::version;
 use crate::key_pairs::ApplicationKeyPairs;
 use crate::swagger_docs::ApiDoc;
@@ -22,6 +25,18 @@ use crate::{config::Configuration, logs::http_trace_layer};
 pub struct AppState {
     application_key_pairs: ApplicationKeyPairs,
     database: toasty::Db,
+}
+
+impl FromRef<AppState> for ApplicationKeyPairs {
+    fn from_ref(app_state: &AppState) -> Self {
+        app_state.application_key_pairs.clone()
+    }
+}
+
+impl FromRef<AppState> for toasty::Db {
+    fn from_ref(app_state: &AppState) -> Self {
+        app_state.database.clone()
+    }
 }
 
 pub struct Application {
@@ -95,9 +110,11 @@ impl Application {
 fn api_v1_routes() -> Router<AppState> {
     let config = Config::from("/api/v1/api-docs/openapi.json");
 
-    Router::new()
+    Router::<AppState>::new()
         .route("/version", get(version))
         .route("/health", get(health_check))
+        .route("/public_key", get(public_key))
+        .route("/verifying_key", get(verifying_key))
         .merge(
             SwaggerUi::new("/swagger")
                 .url("/api-docs/openapi.json", ApiDoc::openapi())
