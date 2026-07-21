@@ -1,13 +1,13 @@
 services:
-  platform:
+  portal:
     # platform: linux/amd64
     build:
       context: .
       ssh:
         - default
       dockerfile: Dockerfile
-    image: platform:latest
-    container_name: platform
+    image: portal:latest
+    container_name: portal
     pull_policy: always
     restart: unless-stopped
     depends_on:
@@ -18,24 +18,24 @@ services:
     env_file:
       - .env
     networks:
-      - platform-net
+      - portal-net
 
   database:
     image: timescale/timescaledb:latest-pg15
-    container_name: platform-database
+    container_name: portal-database
     restart: unless-stopped
     environment:
       PGUSER: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: "${APP_DATABASE__PASSWORD}"
-      POSTGRES_DB: platform
+      POSTGRES_DB: portal
       PGPORT: 5432
     ports:
       - "5432:5432"
     volumes:
-      - "platform_database:/var/lib/postgresql/data"
+      - "portal_database:/var/lib/postgresql/data"
     networks:
-      - platform-net
+      - portal-net
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
@@ -43,8 +43,8 @@ services:
       retries: 5
 
 networks:
-  platform:
+  portal-net:
     driver: bridge
 
 volumes:
-  platform_database:
+  portal_database:
