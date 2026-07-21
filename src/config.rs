@@ -1,4 +1,4 @@
-// use secrecy::{ExposeSecret, SecretBox};
+use secrecy::{ExposeSecret, SecretBox};
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
 use std::env;
@@ -6,6 +6,7 @@ use std::env;
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct Configuration {
     pub application: ApplicationConfig,
+    pub database: DatabaseConfig,
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -13,11 +14,43 @@ pub struct ApplicationConfig {
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
+    pub secret_key_seed: SecretBox<str>,
+    pub api_key: SecretBox<str>,
 }
 
 impl ApplicationConfig {
     pub fn build_address(&self) -> String {
         format!("{}:{}", self.host, self.port)
+    }
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct DatabaseConfig {
+    pub username: String,
+    pub password: SecretBox<str>,
+    #[serde(deserialize_with = "deserialize_number_from_string")]
+    pub db_port: u16,
+    pub host: String,
+    pub database_name: String,
+    pub require_ssl: bool,
+}
+
+impl DatabaseConfig {
+    pub fn build_address(&self) -> String {
+        let ssl_mode = if self.require_ssl {
+            "sslmode=verify-full"
+        } else {
+            ""
+        };
+
+        format!(
+            "postgres://{}:{}@{}:{}/{}{ssl_mode}",
+            self.username,
+            self.password.expose_secret(),
+            self.host,
+            self.db_port,
+            self.database_name
+        )
     }
 }
 
