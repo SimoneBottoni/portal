@@ -9,17 +9,25 @@ repository = "https://github.com/ProvablyAI/platform"
 license = "Apache-2.0"
 rust-version = "1.97"
 
+default-run = "platform"
+
 [dependencies]
 axum = "0.8.9"
+axum-health = "0.2"
 tokio = { version = "1.53", features = ["full"] }
 tower = "0.5"
-tower-http = { version = "0.7", features = ["trace", "request-id", "util"] }
+tower-http = { version = "0.7", features = [
+    "trace",
+    "timeout",
+    "request-id",
+    "util",
+] }
 
 # Util
 anyhow = "1.0"
 dotenv = "0.15"
 config = "0.15"
-secrecy = "0.10.3"
+secrecy = { version = "0.10", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
 serde-aux = "4.7"
 
@@ -30,8 +38,22 @@ tracing-log = "0.2"
 tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
 
 # Database
-toasty = "0.8.0"
+toasty = { version = "0.8", features = ["postgresql"] }
+toasty-cli = "0.8"
 
+# Crypto
+ed25519-dalek = { version = "3.0", features = ["pem"] }
+crypto_box = { version = "0.9", features = ["chacha20", "seal", "serde"] }
+spki = { version = "0.8", features = ["pem"] }
+base64 = "0.22"
+
+# Utoipa
+utoipa = { version = "5.5", features = ["axum_extras", "uuid"] }
+utoipa-swagger-ui = { version = "9.0", features = ["axum"] }
+
+[[bin]]
+name = "migrate"
+path = "src/bin/migrate.rs"
 
 [lints.rust]
 warnings = "deny"
