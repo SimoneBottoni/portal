@@ -6,7 +6,7 @@ use utoipa::OpenApi;
         crate::api::auth::handlers::register,
     ),
     components(
-        schemas(crate::api::auth::handlers::RegistrationParam)
+        schemas(crate::views::auth::RegistrationParam)
     ),
     tags(
         (name = "Auth", description = "Authentication endpoints")
