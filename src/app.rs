@@ -6,16 +6,24 @@ use axum::http::StatusCode;
 use axum::{Router, routing::get};
 
 use axum_health::service::Health;
+use axum_login::{
+    AuthManagerLayerBuilder,
+    tower_sessions::{Expiry, SessionManagerLayer},
+};
 use tokio::net::TcpListener;
 use tokio::signal;
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::timeout::TimeoutLayer;
+use tower_sessions::MemoryStore;
+use tower_sessions::cookie::Key;
+use tower_sessions::cookie::time::Duration as TowerDuration;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
 
 use crate::api::health::health_check;
 use crate::api::version::version;
 use crate::api::{auth, keys};
+use crate::auth::authn_backend::Backend;
 use crate::key_pairs::ApplicationKeyPairs;
 use crate::openapi::ApiDoc;
 use crate::{config::Configuration, logs::http_trace_layer};
@@ -53,14 +61,41 @@ impl Application {
 
         let state = AppState {
             application_key_pairs,
-            database,
+            database: database.clone(),
         };
+
+        let session_store = MemoryStore::default();
+
+        // ---------------------
+        // let session_store = ToastyStore::new(database);
+        // session_store.migrate().await?;
+
+        // let deletion_task = tokio::task::spawn(
+        //     session_store
+        //         .clone()
+        //         .continuously_delete_expired(Duration::from_secs(60)),
+        // );
+
+        // deletion_task.await??;
+        // ---------------------
+
+        // Generate a cryptographic key to sign the session cookie.
+        let key = Key::generate();
+
+        let session_layer = SessionManagerLayer::new(session_store)
+            .with_secure(false)
+            .with_expiry(Expiry::OnInactivity(TowerDuration::days(1)))
+            .with_signed(key);
+
+        let backend = Backend::new(database);
+        let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
 
         let app = Router::<AppState>::new()
             .nest("/api/v1", api_v1_routes())
             // Routes
             .layer(Health::builder().with_ping().build())
             // App Layers
+            .layer(auth_layer)
             .layer(TimeoutLayer::with_status_code(
                 StatusCode::REQUEST_TIMEOUT,
                 Duration::from_secs(10),
