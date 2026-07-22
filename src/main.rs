@@ -1,5 +1,5 @@
 use dotenv::dotenv;
-use platform::config::DatabaseConfig;
+use platform::build_database;
 use platform::key_pairs::ApplicationKeyPairs;
 use platform::{app::Application, config::get_configuration, logs::init_subscriber};
 use std::env;
@@ -39,16 +39,6 @@ async fn main() -> anyhow::Result<()> {
     }
 
     Ok(())
-}
-
-pub async fn build_database(database_config: &DatabaseConfig) -> toasty::Result<toasty::Db> {
-    let db_url = database_config.build_address();
-
-    toasty::Db::builder()
-        .models(toasty::models!(crate::*))
-        .pool_pre_ping(true)
-        .connect(&db_url)
-        .await
 }
 
 fn report_exit(task_name: &str, outcome: Result<Result<(), impl Debug + Display>, JoinError>) {

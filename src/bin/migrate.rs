@@ -10,7 +10,7 @@ async fn main() -> anyhow::Result<()> {
 
     let configuration = get_configuration().expect("Failed to read configuration.");
 
-    let database = platform::build_database(configuration.database).await?;
+    let database = platform::build_database(&configuration.database).await?;
 
     let cli = ToastyCli::with_config(database, config);
     cli.parse_and_run().await?;

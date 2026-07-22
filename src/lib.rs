@@ -10,7 +10,7 @@ pub mod models;
 pub mod openapi;
 pub mod views;
 
-pub async fn build_database(database_config: DatabaseConfig) -> toasty::Result<toasty::Db> {
+pub async fn build_database(database_config: &DatabaseConfig) -> toasty::Result<toasty::Db> {
     let db_url = database_config.build_address();
 
     toasty::Db::builder()
