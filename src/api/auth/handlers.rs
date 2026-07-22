@@ -1,21 +1,10 @@
 use axum::{Json, extract::State, response::IntoResponse};
 use axum_anyhow::ResultExt;
 use axum_valid::Valid;
-use serde::Deserialize;
-use validator::Validate;
 use validify::Modify;
-use validify::Validify;
 
 use crate::models::users::User;
-
-#[derive(Debug, Clone, Deserialize, Validate, Validify, utoipa::ToSchema)]
-pub struct RegistrationParam {
-    #[modify(lowercase)]
-    #[validate(email(message = "Please provide a valid email address"))]
-    email: String,
-    #[validate(length(min = 8, message = "Password must be at least 8 characters long"))]
-    password_hash: String,
-}
+use crate::views::auth::RegistrationParam;
 
 #[utoipa::path(
     post,
