@@ -5,7 +5,6 @@ use axum::extract::FromRef;
 use axum::http::StatusCode;
 use axum::{Router, routing::get};
 
-use axum_health::health_check;
 use axum_health::service::Health;
 use tokio::net::TcpListener;
 use tokio::signal;
@@ -14,17 +13,17 @@ use tower_http::timeout::TimeoutLayer;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
 
-use crate::api::public_key::public_key;
-use crate::api::verifying_key::verifying_key;
+use crate::api::health::health_check;
 use crate::api::version::version;
+use crate::api::{auth, keys};
 use crate::key_pairs::ApplicationKeyPairs;
-use crate::swagger_docs::ApiDoc;
+use crate::openapi::ApiDoc;
 use crate::{config::Configuration, logs::http_trace_layer};
 
 #[derive(Clone)]
 pub struct AppState {
-    application_key_pairs: ApplicationKeyPairs,
-    database: toasty::Db,
+    pub application_key_pairs: ApplicationKeyPairs,
+    pub database: toasty::Db,
 }
 
 impl FromRef<AppState> for ApplicationKeyPairs {
@@ -113,8 +112,8 @@ fn api_v1_routes() -> Router<AppState> {
     Router::<AppState>::new()
         .route("/version", get(version))
         .route("/health", get(health_check))
-        .route("/public_key", get(public_key))
-        .route("/verifying_key", get(verifying_key))
+        .merge(keys::routes::routes())
+        .nest("/auth", auth::routes::routes())
         .merge(
             SwaggerUi::new("/swagger")
                 .url("/api-docs/openapi.json", ApiDoc::openapi())
