@@ -1,15 +1,15 @@
 use jiff::Timestamp;
 use uuid::Uuid;
 
-#[derive(Debug, toasty::Model)]
+#[derive(Debug, Clone, toasty::Model)]
 pub struct User {
     #[key]
     #[auto]
-    id: Uuid,
+    pub id: Uuid,
 
     #[unique]
     email: String,
-    password_hash: String,
+    pub password_hash: String,
 
     #[default(false)]
     is_admin: bool,
@@ -35,6 +35,30 @@ impl User {
         })
         .exec(db)
         .await?;
+
+        Ok(())
+    }
+
+    pub async fn read_user_by_email(
+        db: &mut toasty::Db,
+        email: String,
+    ) -> Result<Self, toasty::Error> {
+        User::filter_by_email(email).get(db).await
+    }
+
+    pub async fn read_user_by_id(db: &mut toasty::Db, id: &Uuid) -> Result<Self, toasty::Error> {
+        User::filter_by_id(id).get(db).await
+    }
+
+    pub async fn update_user_password(
+        db: &mut toasty::Db,
+        id: Uuid,
+        password_hash: &str,
+    ) -> anyhow::Result<()> {
+        User::update_by_id(id)
+            .password_hash(password_hash)
+            .exec(db)
+            .await?;
 
         Ok(())
     }
