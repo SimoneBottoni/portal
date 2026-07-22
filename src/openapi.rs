@@ -2,7 +2,7 @@ use utoipa::OpenApi;
 
 // struct SecurityAddon;
 
-// impl Modify for SecurityAddon {
+// impl utoipa::Modify for SecurityAddon {
 //     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
 //         let mut components: Components = openapi.components.clone().unwrap_or_default();
 //         components.add_security_scheme(
@@ -16,9 +16,13 @@ use utoipa::OpenApi;
 #[derive(OpenApi)]
 #[openapi(
     paths(
+        crate::api::health::health_check,
         crate::api::version::version,
-        crate::api::public_key::public_key,
-        crate::api::verifying_key::verifying_key,
+        crate::api::keys::handlers::public_key,
+        crate::api::keys::handlers::verifying_key,
+    ),
+    nest(
+        (path = "/auth", api = crate::api::auth::openapi::ApiDoc),
     ),
     servers(
         (url = "/api/v1", description = "Api v1")
@@ -28,7 +32,9 @@ use utoipa::OpenApi;
     ),
     // modifiers(&SecurityAddon),
     tags(
+        (name = "Auth", description = "Authentication endpoints"),
         (name = "Health", description = "Health check endpoint"),
+        (name = "Keys", description = "Cryptographic key endpoints"),
         (name = "Version", description = "Application version endpoint"),
     )
 )]
