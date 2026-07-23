@@ -1,4 +1,5 @@
 use oauth2::{AuthUrl, ClientId, ClientSecret, TokenUrl, basic::BasicClient};
+use secrecy::ExposeSecret;
 use serde::Deserialize;
 
 use crate::auth::authn_backend::BasicClientSet;
@@ -49,12 +50,12 @@ impl OAuthProviders {
         let github = OAuthProvider::build(
             OAuthProviderKind::GitHub,
             config.github_id.clone(),
-            config.github_secret.clone(),
+            config.github_secret.expose_secret().to_string(),
         );
         let google = OAuthProvider::build(
             OAuthProviderKind::Google,
             config.google_id.clone(),
-            config.google_secret.clone(),
+            config.google_secret.expose_secret().to_string(),
         );
 
         Self { github, google }

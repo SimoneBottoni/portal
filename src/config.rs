@@ -68,9 +68,9 @@ pub struct MailerConfig {
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct OAuthProvidersConfig {
     pub github_id: String,
-    pub github_secret: String,
+    pub github_secret: SecretBox<str>,
     pub google_id: String,
-    pub google_secret: String,
+    pub google_secret: SecretBox<str>,
 }
 
 pub fn get_configuration() -> Result<Configuration, config::ConfigError> {
