@@ -7,6 +7,7 @@ use std::env;
 pub struct Configuration {
     pub application: ApplicationConfig,
     pub database: DatabaseConfig,
+    pub mailer: MailerConfig,
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -52,6 +53,15 @@ impl DatabaseConfig {
             self.database_name
         )
     }
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct MailerConfig {
+    pub from: String,
+    pub host: String,
+    pub username: String,
+    pub api_key: SecretBox<str>,
+    pub domain: String,
 }
 
 pub fn get_configuration() -> Result<Configuration, config::ConfigError> {

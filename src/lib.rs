@@ -6,6 +6,7 @@ pub mod auth;
 pub mod config;
 pub mod key_pairs;
 pub mod logs;
+pub mod mailer;
 pub mod models;
 pub mod openapi;
 pub mod views;

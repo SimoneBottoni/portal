@@ -25,6 +25,7 @@ use crate::api::version::version;
 use crate::api::{auth, keys};
 use crate::auth::authn_backend::Backend;
 use crate::key_pairs::ApplicationKeyPairs;
+use crate::mailer::MailerContext;
 use crate::openapi::ApiDoc;
 use crate::{config::Configuration, logs::http_trace_layer};
 
@@ -32,6 +33,7 @@ use crate::{config::Configuration, logs::http_trace_layer};
 pub struct AppState {
     pub application_key_pairs: ApplicationKeyPairs,
     pub database: toasty::Db,
+    pub mailer: MailerContext,
 }
 
 impl FromRef<AppState> for ApplicationKeyPairs {
@@ -46,6 +48,12 @@ impl FromRef<AppState> for toasty::Db {
     }
 }
 
+impl FromRef<AppState> for MailerContext {
+    fn from_ref(app_state: &AppState) -> Self {
+        app_state.mailer.clone()
+    }
+}
+
 pub struct Application {
     app: Router,
     listener: TcpListener,
@@ -56,12 +64,14 @@ impl Application {
         config: Configuration,
         application_key_pairs: ApplicationKeyPairs,
         database: toasty::Db,
+        mailer: MailerContext,
     ) -> anyhow::Result<Self> {
         let address = config.application.build_address();
 
         let state = AppState {
             application_key_pairs,
             database: database.clone(),
+            mailer,
         };
 
         let session_store = MemoryStore::default();

@@ -1,6 +1,7 @@
 use dotenv::dotenv;
 use platform::build_database;
 use platform::key_pairs::ApplicationKeyPairs;
+use platform::mailer::MailerContext;
 use platform::{app::Application, config::get_configuration, logs::init_subscriber};
 use std::env;
 use std::fmt::{Debug, Display};
@@ -27,8 +28,17 @@ async fn main() -> anyhow::Result<()> {
     info!("Getting Database connection");
     let database = build_database(&configuration.database).await?;
 
+    info!("Creating mailer connection");
+    let mailer_context = MailerContext::build(&configuration.mailer);
+
     info!("Creating application");
-    let application = Application::build(configuration, application_key_pairs, database).await?;
+    let application = Application::build(
+        configuration,
+        application_key_pairs,
+        database,
+        mailer_context,
+    )
+    .await?;
 
     info!("Starting application");
     let application = tokio::spawn(application.run());
