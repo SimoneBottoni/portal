@@ -13,7 +13,8 @@ use crate::{
         oauth_providers::{GitHubUserInfo, GoogleUserInfo, NormalizedProfile, OAuthProviders},
         password::verify_password_hash,
     },
-    models::users::User,
+    models::user::User,
+    services::auth::{AuthService, AuthServiceError},
     views::auth::{Credentials, OAuthProviderKind},
 };
 
@@ -168,10 +169,16 @@ impl AuthnBackend for Backend {
                     }
                 };
 
-                let user =
-                    User::find_or_create_oauth_user(&mut db, oauth_credentials.provider, &profile)
-                        .await
-                        .map_err(AuthError::Database)?;
+                let user = AuthService::find_or_create_oauth_user(
+                    &mut db,
+                    oauth_credentials.provider,
+                    &profile,
+                )
+                .await
+                .map_err(|err| match err {
+                    AuthServiceError::Database(db_err) => AuthError::Database(db_err),
+                    _ => AuthError::AuthFailed,
+                })?;
 
                 Ok(Some(user))
             }

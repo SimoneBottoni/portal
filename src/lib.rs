@@ -9,6 +9,7 @@ pub mod logs;
 pub mod mailer;
 pub mod models;
 pub mod openapi;
+pub mod services;
 pub mod views;
 
 pub async fn build_database(database_config: &DatabaseConfig) -> toasty::Result<toasty::Db> {

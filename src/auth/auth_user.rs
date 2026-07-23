@@ -1,7 +1,7 @@
 use axum_login::AuthUser;
 use uuid::Uuid;
 
-use crate::models::users::User;
+use crate::models::user::User;
 
 impl AuthUser for User {
     type Id = Uuid;

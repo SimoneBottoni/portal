@@ -1,16 +1,15 @@
 use axum::extract::Query;
 use axum::response::IntoResponse;
 use axum::{Json, extract::State};
-use axum_anyhow::{ApiResult, OptionExt, ResultExt, unauthorized};
+use axum_anyhow::{ApiResult, OptionExt, ResultExt, internal_error, unauthorized};
 use axum_valid::Valid;
 use oauth2::CsrfToken;
 use tower_sessions::Session;
 use validify::Modify;
 
 use crate::auth::authn_backend::AuthSession;
-use crate::auth::password::{hash_password, verify_password_hash};
 use crate::mailer::MailerContext;
-use crate::models::users::User;
+use crate::services::auth::{AuthService, AuthServiceError};
 use crate::views::auth::{
     AuthzResp, ChangePasswordParams, Credentials, OAuthCredentials, OAuthLoginQuery,
     OAuthLoginResponse, OAuthProviderKind, UserCredentials,
@@ -36,21 +35,9 @@ pub async fn register(
 ) -> ApiResult<()> {
     params.modify();
 
-    let password_hash = hash_password(params.password)
+    AuthService::register_user(&mut db, &mailer, &params.email, params.password)
         .await
-        .context_internal("Hashing failed", "Internal Server Error.")?;
-
-    User::create_user(&mut db, &params.email, &password_hash)
-        .await
-        .context_bad_request("User creation failed", "Could not register user.")?;
-
-    if let Err(err) = mailer.send_welcome(&params.email, "").await {
-        tracing::error!(
-            "Failed to send welcome email to {}: {:?}",
-            params.email,
-            err
-        );
-    }
+        .context_internal("User creation failed", "Could not register user.")?;
 
     Ok(())
 }
@@ -220,26 +207,24 @@ pub async fn change_password(
         .clone()
         .context_unauthorized("Auth required", "You are not logged in.")?;
 
-    let expected_hash = user.password_hash.clone();
-
-    let is_valid = verify_password_hash(params.current_password, &expected_hash)
-        .await
-        .context_internal("Task error", "Internal Server Error.")?;
-
-    if !is_valid {
-        return Err(unauthorized(
-            "Invalid password",
-            "Failed to verify current password.",
-        ));
+    match AuthService::change_password(
+        &mut db,
+        user.id,
+        &user.password_hash,
+        params.current_password,
+        params.new_password,
+    )
+    .await
+    {
+        Ok(()) => {}
+        Err(AuthServiceError::InvalidCurrentPassword) => {
+            return Err(unauthorized(
+                "Invalid password",
+                "Failed to verify current password.",
+            ));
+        }
+        Err(err) => return Err(internal_error("Internal Server Error", &format!("{err}"))),
     }
-
-    let new_password_hash = hash_password(params.new_password)
-        .await
-        .context_internal("Task error", "Internal Server Error.")?;
-
-    User::update_user_password(&mut db, user.id, &new_password_hash)
-        .await
-        .context_internal("DB error", "Failed to update password.")?;
 
     auth_session
         .logout()

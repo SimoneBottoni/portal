@@ -3,7 +3,7 @@ use axum_anyhow::{ApiError, OptionExt, unauthorized};
 use axum_login::AuthSession;
 
 use crate::auth::authn_backend::Backend;
-use crate::models::users::User;
+use crate::models::user::User;
 
 pub struct AuthUser(pub User);
 
