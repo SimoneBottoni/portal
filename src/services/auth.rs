@@ -7,8 +7,7 @@ use crate::mailer::MailerContext;
 use crate::models::user::User;
 
 use crate::{
-    auth::oauth_providers::NormalizedProfile,
-    models::oauth_account::OAuthAccount,
+    auth::oauth_providers::NormalizedProfile, models::oauth_account::OAuthAccount,
     views::auth::OAuthProviderKind,
 };
 

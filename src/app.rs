@@ -15,8 +15,8 @@ use tokio::signal;
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::timeout::TimeoutLayer;
 use tower_sessions::MemoryStore;
-use tower_sessions::cookie::time::Duration as TowerDuration;
 use tower_sessions::cookie::SameSite;
+use tower_sessions::cookie::time::Duration as TowerDuration;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
 
