@@ -5,6 +5,8 @@ use utoipa::OpenApi;
     paths(
         crate::api::auth::handlers::register,
         crate::api::auth::handlers::login,
+        crate::api::auth::handlers::oauth_login,
+        crate::api::auth::handlers::oauth_callback,
         crate::api::auth::handlers::logout,
         crate::api::auth::handlers::change_password,
     ),
@@ -12,6 +14,9 @@ use utoipa::OpenApi;
         schemas(
             crate::views::auth::UserCredentials,
             crate::views::auth::ChangePasswordParams,
+            crate::views::auth::OAuthProviderKind,
+            crate::views::auth::OAuthLoginQuery,
+            crate::views::auth::OAuthLoginResponse,
         )
     ),
     tags(
