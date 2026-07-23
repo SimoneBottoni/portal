@@ -8,6 +8,7 @@ pub struct Configuration {
     pub application: ApplicationConfig,
     pub database: DatabaseConfig,
     pub mailer: MailerConfig,
+    pub oauth: OAuthProvidersConfig,
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -62,6 +63,14 @@ pub struct MailerConfig {
     pub username: String,
     pub api_key: SecretBox<str>,
     pub domain: String,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct OAuthProvidersConfig {
+    pub github_id: String,
+    pub github_secret: String,
+    pub google_id: String,
+    pub google_secret: String,
 }
 
 pub fn get_configuration() -> Result<Configuration, config::ConfigError> {

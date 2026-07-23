@@ -16,3 +16,8 @@ mailer:
   username: ""
   api_key: ""
   domain: ""
+oauth:
+  github_id: ""
+  github_secret: ""
+  google_id: ""
+  google_secret: ""

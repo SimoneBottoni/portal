@@ -1,4 +1,5 @@
 use dotenv::dotenv;
+use platform::auth::oauth_providers::OAuthProviders;
 use platform::build_database;
 use platform::key_pairs::ApplicationKeyPairs;
 use platform::mailer::MailerContext;
@@ -31,12 +32,16 @@ async fn main() -> anyhow::Result<()> {
     info!("Creating mailer connection");
     let mailer_context = MailerContext::build(&configuration.mailer);
 
+    info!("Building providers");
+    let oauth_providers = OAuthProviders::build_all(&configuration.oauth);
+
     info!("Creating application");
     let application = Application::build(
         configuration,
         application_key_pairs,
         database,
         mailer_context,
+        oauth_providers,
     )
     .await?;
 

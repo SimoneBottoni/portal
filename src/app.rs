@@ -15,8 +15,8 @@ use tokio::signal;
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::timeout::TimeoutLayer;
 use tower_sessions::MemoryStore;
-use tower_sessions::cookie::Key;
 use tower_sessions::cookie::time::Duration as TowerDuration;
+use tower_sessions::cookie::{Key, SameSite};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
 
@@ -24,6 +24,7 @@ use crate::api::health::health_check;
 use crate::api::version::version;
 use crate::api::{auth, keys};
 use crate::auth::authn_backend::Backend;
+use crate::auth::oauth_providers::OAuthProviders;
 use crate::key_pairs::ApplicationKeyPairs;
 use crate::mailer::MailerContext;
 use crate::openapi::ApiDoc;
@@ -65,6 +66,7 @@ impl Application {
         application_key_pairs: ApplicationKeyPairs,
         database: toasty::Db,
         mailer: MailerContext,
+        oauth_providers: OAuthProviders,
     ) -> anyhow::Result<Self> {
         let address = config.application.build_address();
 
@@ -95,9 +97,10 @@ impl Application {
         let session_layer = SessionManagerLayer::new(session_store)
             .with_secure(false)
             .with_expiry(Expiry::OnInactivity(TowerDuration::days(1)))
+            .with_same_site(SameSite::Lax)
             .with_signed(key);
 
-        let backend = Backend::new(database);
+        let backend = Backend::new(database, oauth_providers);
         let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
 
         let app = Router::<AppState>::new()
