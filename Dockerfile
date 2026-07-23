@@ -15,7 +15,7 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN --mount=type=ssh cargo chef cook --release --recipe-path recipe.json
 
 COPY . .
-RUN cargo build --release --bin platform
+RUN cargo build --release --bin portal
 
 FROM ubuntu:latest AS runtime
 EXPOSE 8080
@@ -31,7 +31,7 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY --from=builder /app/target/release/platform platform
+COPY --from=builder /app/target/release/portal portal
 
 COPY configuration configuration
 ENV APP_ENVIRONMENT=production
@@ -42,4 +42,4 @@ RUN chown -R appuser:appuser /app
 # Run the container as 'appuser'
 USER appuser
 
-ENTRYPOINT ["./platform"]
+ENTRYPOINT ["./portal"]

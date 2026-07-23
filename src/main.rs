@@ -1,9 +1,9 @@
 use dotenv::dotenv;
-use platform::auth::oauth_providers::OAuthProviders;
-use platform::build_database;
-use platform::key_pairs::ApplicationKeyPairs;
-use platform::mailer::MailerContext;
-use platform::{app::Application, config::get_configuration, logs::init_subscriber};
+use portal::auth::oauth_providers::OAuthProviders;
+use portal::build_database;
+use portal::key_pairs::ApplicationKeyPairs;
+use portal::mailer::MailerContext;
+use portal::{app::Application, config::get_configuration, logs::init_subscriber};
 use std::env;
 use std::fmt::{Debug, Display};
 use tokio::task::JoinError;

@@ -1,15 +1,15 @@
 [package]
-name = "platform"
+name = "portal"
 version = "0.1.0"
 edition = "2024"
 authors = ["Provably Technologies"]
-description = "Platform application"
+description = "Portal application"
 homepage = "https://provably.ai/"
-repository = "https://github.com/ProvablyAI/platform"
+repository = "https://github.com/ProvablyAI/portal"
 license = "Apache-2.0"
 rust-version = "1.97"
 
-default-run = "platform"
+default-run = "portal"
 
 [dependencies]
 axum = { version = "0.8", features = ["macros"] }
