@@ -34,11 +34,13 @@ pub async fn register(
         .await
         .context_bad_request("User creation failed", "Could not register user.")?;
 
-    // TODO: should not fail - handle error
-    mailer
-        .send_welcome(&params.email, "")
-        .await
-        .context_internal("InternalServerError", "Failed to send email.")?;
+    if let Err(err) = mailer.send_welcome(&params.email, "").await {
+        tracing::error!(
+            "Failed to send welcome email to {}: {:?}",
+            params.email,
+            err
+        );
+    }
 
     Ok(())
 }
