@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::Context;
@@ -71,6 +70,8 @@ impl Application {
     ) -> anyhow::Result<Self> {
         let address = config.application.build_address();
 
+        let session_key = application_key_pairs.session_key.key.clone();
+
         let state = AppState {
             application_key_pairs,
             database: database.clone(),
@@ -96,7 +97,7 @@ impl Application {
             .with_secure(false)
             .with_expiry(Expiry::OnInactivity(TowerDuration::days(1)))
             .with_same_site(SameSite::Lax)
-            .with_signed(application_key_pairs.session_key.key.clone());
+            .with_signed(session_key);
 
         let backend = Backend::new(database, oauth_providers);
         let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
