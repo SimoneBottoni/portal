@@ -5,6 +5,7 @@ use validify::Modify;
 
 use crate::auth::authn_backend::AuthSession;
 use crate::auth::password::{hash_password, verify_password_hash};
+use crate::mailer::MailerContext;
 use crate::models::users::User;
 use crate::views::auth::{ChangePasswordParams, UserCredentials};
 
@@ -18,9 +19,9 @@ use crate::views::auth::{ChangePasswordParams, UserCredentials};
     ),
     tag = "Auth"
 )]
-#[axum::debug_handler]
 pub async fn register(
     State(mut db): State<toasty::Db>,
+    State(mailer): State<MailerContext>,
     Valid(Json(mut params)): Valid<Json<UserCredentials>>,
 ) -> ApiResult<()> {
     params.modify();
@@ -32,6 +33,12 @@ pub async fn register(
     User::create_user(&mut db, &params.email, &password_hash)
         .await
         .context_bad_request("User creation failed", "Could not register user.")?;
+
+    // TODO: should not fail - handle error
+    mailer
+        .send_welcome(&params.email, "")
+        .await
+        .context_internal("InternalServerError", "Failed to send email.")?;
 
     Ok(())
 }

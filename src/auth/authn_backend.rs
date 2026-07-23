@@ -1,6 +1,8 @@
 use axum_login::AuthnBackend;
 
-use crate::{auth::password::verify_password_hash, models::users::User, views::auth::UserCredentials};
+use crate::{
+    auth::password::verify_password_hash, models::users::User, views::auth::UserCredentials,
+};
 
 const DUMMY_HASH: &str =
     "$argon2id$v=19$m=19456,t=2,p=1$cGxlYXNlZG9ub3R1c2U$placeholderhashforconstanttimecheck";

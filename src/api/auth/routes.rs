@@ -1,7 +1,4 @@
-use axum::{
-    Router,
-    routing::post,
-};
+use axum::{Router, routing::post};
 
 use crate::{
     api::auth::handlers::{change_password, login, logout, register},
