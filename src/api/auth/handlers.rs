@@ -223,7 +223,18 @@ pub async fn change_password(
                 "Failed to verify current password.",
             ));
         }
-        Err(err) => return Err(internal_error("Internal Server Error", &format!("{err}"))),
+        Err(AuthServiceError::InvalidCredentials) => {
+            return Err(unauthorized(
+                "Invalid credentials",
+                "Invalid email or password.",
+            ));
+        }
+        Err(AuthServiceError::Database(_)) | Err(AuthServiceError::Other(_)) => {
+            return Err(internal_error(
+                "Password change failed",
+                "Internal Server Error.",
+            ));
+        }
     }
 
     auth_session
