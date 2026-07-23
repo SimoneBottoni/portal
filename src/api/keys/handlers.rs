@@ -8,7 +8,7 @@ use crate::key_pairs::ApplicationKeyPairs;
     responses(
         (status = 200, description = "Public verification key in PEM format", body = String)
     ),
-    security(("bearer_auth" = [])),
+    security(("session_auth" = [])),
     tag = "Keys"
 )]
 pub async fn public_key(State(key_pairs): State<ApplicationKeyPairs>) -> Json<String> {
@@ -21,7 +21,7 @@ pub async fn public_key(State(key_pairs): State<ApplicationKeyPairs>) -> Json<St
     responses(
         (status = 200, description = "Public verifying key in PEM format", body = String)
     ),
-    security(("bearer_auth" = [])),
+    security(("session_auth" = [])),
     tag = "Keys"
 )]
 pub async fn verifying_key(State(key_pairs): State<ApplicationKeyPairs>) -> Json<String> {

@@ -1,17 +1,18 @@
 use utoipa::OpenApi;
+use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
 
-// struct SecurityAddon;
+struct SecurityAddon;
 
-// impl utoipa::Modify for SecurityAddon {
-//     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-//         let mut components: Components = openapi.components.clone().unwrap_or_default();
-//         components.add_security_scheme(
-//             "bearer_auth",
-//             SecurityScheme::Http(Http::new(HttpAuthScheme::Bearer)),
-//         );
-//         openapi.components = Some(components);
-//     }
-// }
+impl utoipa::Modify for SecurityAddon {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        let mut components = openapi.components.clone().unwrap_or_default();
+        components.add_security_scheme(
+            "session_auth",
+            SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new("id"))),
+        );
+        openapi.components = Some(components);
+    }
+}
 
 #[derive(OpenApi)]
 #[openapi(
@@ -30,7 +31,7 @@ use utoipa::OpenApi;
     components(
         schemas()
     ),
-    // modifiers(&SecurityAddon),
+    modifiers(&SecurityAddon),
     tags(
         (name = "Auth", description = "Authentication endpoints"),
         (name = "Health", description = "Health check endpoint"),
