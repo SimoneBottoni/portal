@@ -10,3 +10,9 @@ database:
   password: "postgres"
   database_name: "portal"
   require_ssl: false
+mailer:
+  from: ""
+  host: "localhost"
+  username: ""
+  api_key: ""
+  domain: ""
