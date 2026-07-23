@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::Context;
@@ -16,7 +17,7 @@ use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetReques
 use tower_http::timeout::TimeoutLayer;
 use tower_sessions::MemoryStore;
 use tower_sessions::cookie::time::Duration as TowerDuration;
-use tower_sessions::cookie::{Key, SameSite};
+use tower_sessions::cookie::SameSite;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
 
@@ -91,14 +92,11 @@ impl Application {
         // deletion_task.await??;
         // ---------------------
 
-        // Generate a cryptographic key to sign the session cookie.
-        let key = Key::generate();
-
         let session_layer = SessionManagerLayer::new(session_store)
             .with_secure(false)
             .with_expiry(Expiry::OnInactivity(TowerDuration::days(1)))
             .with_same_site(SameSite::Lax)
-            .with_signed(key);
+            .with_signed(application_key_pairs.session_key.key.clone());
 
         let backend = Backend::new(database, oauth_providers);
         let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();

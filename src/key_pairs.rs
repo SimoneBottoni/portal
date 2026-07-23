@@ -1,5 +1,6 @@
 use base64::Engine;
 use base64::engine::general_purpose;
+use cookie::Key;
 use crypto_box::SecretKey;
 use ed25519_dalek::SigningKey;
 use ed25519_dalek::pkcs8::EncodePublicKey;
@@ -14,6 +15,7 @@ use spki::{AlgorithmIdentifier, ObjectIdentifier, SubjectPublicKeyInfo};
 pub struct ApplicationKeyPairs {
     pub x25519_keypair: X25519KeyPair,
     pub ed25519_keypair: Ed25519KeyPair,
+    pub session_key: SessionKey,
 }
 
 impl ApplicationKeyPairs {
@@ -22,12 +24,14 @@ impl ApplicationKeyPairs {
 
         let x25519_keypair = X25519KeyPair::build(secret_key_seed_bytes);
         let ed25519_keypair = Ed25519KeyPair::build(secret_key_seed_bytes);
+        let session_key = SessionKey::build(secret_key_seed_bytes);
 
         secret_key_seed_bytes.zeroize();
 
         Self {
             x25519_keypair,
             ed25519_keypair,
+            session_key,
         }
     }
 
@@ -102,5 +106,17 @@ impl Ed25519KeyPair {
             signing_key,
             verifying_key_pem,
         }
+    }
+}
+
+#[derive(Clone)]
+pub struct SessionKey {
+    pub key: Key,
+}
+
+impl SessionKey {
+    pub fn build(secret_key_seed_bytes: [u8; 32]) -> Self {
+        let key = Key::derive_from(&secret_key_seed_bytes);
+        Self { key }
     }
 }

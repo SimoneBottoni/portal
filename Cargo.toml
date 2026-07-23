@@ -25,6 +25,7 @@ tower-http = { version = "0.7", features = [
     "util",
 ] }
 tower-sessions = { version = "0.14", features = ["signed"] }
+cookie = { version = "0.18", features = ["key-expansion"] }
 # tower-sessions-toasty-store = "0.1"
 
 # Mailer
