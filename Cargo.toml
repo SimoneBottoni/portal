@@ -26,6 +26,16 @@ tower-http = { version = "0.7", features = [
 tower-sessions = { version = "0.14", features = ["signed"] }
 # tower-sessions-toasty-store = "0.1"
 
+# Mailer
+lettre = { version = "0.11", features = [
+    "serde",
+    "pool",
+    "tracing",
+    "builder",
+    "tokio1",
+    "tokio1-native-tls",
+] }
+askama = "0.12"
 
 # Validation
 validator = { version = "0.20.0", features = ["derive"] }
