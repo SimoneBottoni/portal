@@ -79,7 +79,7 @@ impl AuthnBackend for Backend {
         &self,
         creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        let mut db: toasty::Db = self.db.clone();
+        let mut db = self.db.clone();
 
         match creds {
             Credentials::Password(user_credentials) => {
@@ -186,7 +186,7 @@ impl AuthnBackend for Backend {
         &self,
         user_id: &axum_login::UserId<Self>,
     ) -> Result<Option<Self::User>, Self::Error> {
-        let mut db: toasty::Db = self.db.clone();
+        let mut db = self.db.clone();
 
         match User::read_user_by_id(&mut db, user_id).await {
             Ok(user) => Ok(Some(user)),
