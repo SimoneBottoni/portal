@@ -1,0 +1,10 @@
+Welcome to Provably V2.0 Beta!
+
+Your account has been created successfully.
+
+Before you get started, please verify your account by clicking visiting here:
+
+{{domain}}/verify-email?token={{token}}
+
+Best regards,
+The Provably Team
