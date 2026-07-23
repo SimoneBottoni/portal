@@ -11,15 +11,12 @@ use reqwest::{
 use crate::{
     auth::{
         oauth_providers::{GitHubUserInfo, GoogleUserInfo, NormalizedProfile, OAuthProviders},
-        password::verify_password_hash,
+        password::{DUMMY_HASH, verify_password_hash},
     },
     models::user::User,
     services::auth::{AuthService, AuthServiceError},
     views::auth::{Credentials, OAuthProviderKind},
 };
-
-pub const DUMMY_HASH: &str =
-    "$argon2id$v=19$m=19456,t=2,p=1$cGxlYXNlZG9ub3R1c2U$placeholderhashforconstanttimecheck";
 
 #[derive(Debug, thiserror::Error)]
 pub enum AuthError {

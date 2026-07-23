@@ -2,12 +2,12 @@ use thiserror::Error;
 use toasty::Executor;
 use uuid::Uuid;
 
-use crate::auth::password::{hash_password, verify_password_hash};
+use crate::auth::password::{DUMMY_HASH, hash_password, verify_password_hash};
 use crate::mailer::MailerContext;
 use crate::models::user::User;
 
 use crate::{
-    auth::{authn_backend::DUMMY_HASH, oauth_providers::NormalizedProfile},
+    auth::oauth_providers::NormalizedProfile,
     models::oauth_account::OAuthAccount,
     views::auth::OAuthProviderKind,
 };
