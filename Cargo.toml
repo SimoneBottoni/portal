@@ -15,6 +15,7 @@ default-run = "platform"
 axum = { version = "0.8", features = ["macros"] }
 axum-health = "0.2"
 axum-login = "0.18.0"
+oauth2 = "5.0"
 tokio = { version = "1.53", features = ["full"] }
 tower = "0.5"
 tower-http = { version = "0.7", features = [
@@ -53,6 +54,7 @@ serde-aux = "4.7"
 async-trait = "0.1"
 thiserror = "2.0"
 serde_json = "1.0"
+reqwest = { version = "0.12", features = ["json"] }
 
 # Logs
 tracing = "0.1"
