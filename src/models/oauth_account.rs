@@ -2,7 +2,7 @@ use jiff::Timestamp;
 use toasty::Executor;
 use uuid::Uuid;
 
-use crate::models::users::User;
+use crate::models::user::User;
 
 #[derive(Debug, Clone, toasty::Model)]
 #[unique(provider, provider_user_id)]
