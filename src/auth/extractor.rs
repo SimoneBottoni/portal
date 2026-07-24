@@ -20,7 +20,7 @@ where
 
         let user = auth_session
             .user
-            .context_unauthorized("Auth required", "You are not logged in.")?;
+            .context_unauthorized(("Auth required", "You are not logged in."))?;
 
         Ok(Self(user))
     }

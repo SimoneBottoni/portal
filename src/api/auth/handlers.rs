@@ -37,7 +37,7 @@ pub async fn register(
 
     AuthService::register_user(&mut db, &mailer, &params.email, params.password)
         .await
-        .context_internal("User creation failed", "Could not register user.")?;
+        .context_internal(("User creation failed", "Could not register user."))?;
 
     Ok(())
 }
@@ -61,18 +61,18 @@ pub async fn login(
     let user = auth_session
         .authenticate(Credentials::Password(params))
         .await
-        .context_internal("Auth backend failed", "Internal Server Error.")?
-        .context_unauthorized("Invalid credentials", "Invalid email or password.")?;
+        .context_internal(("Auth backend failed", "Internal Server Error."))?
+        .context_unauthorized(("Invalid credentials", "Invalid email or password."))?;
 
     auth_session
         .logout()
         .await
-        .context_internal("Session purge failed", "Internal Server Error.")?;
+        .context_internal(("Session purge failed", "Internal Server Error."))?;
 
     auth_session
         .login(&user)
         .await
-        .context_internal("Session write failed", "Internal Server Error.")?;
+        .context_internal(("Session write failed", "Internal Server Error."))?;
 
     Ok(())
 }
@@ -127,23 +127,23 @@ pub async fn oauth_callback(
     let old_state: CsrfToken = session
         .remove(CSRF_STATE_KEY)
         .await
-        .context_internal("Session error reading CSRF state", "Internal Server Error.")?
-        .context_bad_request(
+        .context_internal(("Session error reading CSRF state", "Internal Server Error."))?
+        .context_bad_request((
             "Missing CSRF state in session",
             "OAuth session expired or invalid.",
-        )?;
+        ))?;
 
     let provider: OAuthProviderKind = session
         .remove(PROVIDER_KEY)
         .await
-        .context_internal(
+        .context_internal((
             "Session error reading OAuth provider",
             "Internal Server Error.",
-        )?
-        .context_bad_request(
+        ))?
+        .context_bad_request((
             "Missing OAuth provider in session",
             "OAuth session expired or invalid.",
-        )?;
+        ))?;
 
     let creds = Credentials::OAuth(OAuthCredentials {
         provider,
@@ -155,16 +155,16 @@ pub async fn oauth_callback(
     let user = auth_session
         .authenticate(creds)
         .await
-        .context_internal("Auth backend failed", "Internal Server Error.")?
-        .context_unauthorized(
+        .context_internal(("Auth backend failed", "Internal Server Error."))?
+        .context_unauthorized((
             "OAuth verification failed",
             "Invalid OAuth state or authorization code.",
-        )?;
+        ))?;
 
     auth_session
         .login(&user)
         .await
-        .context_internal("Session write failed", "Internal Server Error.")?;
+        .context_internal(("Session write failed", "Internal Server Error."))?;
 
     Ok(())
 }
@@ -182,7 +182,7 @@ pub async fn logout(mut auth_session: AuthSession) -> ApiResult<()> {
     auth_session
         .logout()
         .await
-        .context_internal("Logout error", "Internal Server Error.")?;
+        .context_internal(("Logout error", "Internal Server Error."))?;
 
     Ok(())
 }
@@ -205,7 +205,7 @@ pub async fn change_password(
     let user = auth_session
         .user
         .clone()
-        .context_unauthorized("Auth required", "You are not logged in.")?;
+        .context_unauthorized(("Auth required", "You are not logged in."))?;
 
     match AuthService::change_password(
         &mut db,
@@ -234,7 +234,7 @@ pub async fn change_password(
     auth_session
         .logout()
         .await
-        .context_internal("Session error", "Internal Server Error.")?;
+        .context_internal(("Session error", "Internal Server Error."))?;
 
     Ok(())
 }

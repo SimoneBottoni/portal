@@ -37,7 +37,7 @@ lettre = { version = "0.11", features = [
     "tokio1",
     "tokio1-native-tls",
 ] }
-askama = "0.12"
+askama = "0.16"
 
 # Validation
 validator = { version = "0.20.0", features = ["derive"] }
@@ -46,7 +46,7 @@ validify = "2.0.0"
 
 # Util
 anyhow = "1.0"
-axum-anyhow = "0.10"
+axum-anyhow = "0.11"
 dotenv = "0.15"
 config = "0.15"
 secrecy = { version = "0.10", features = ["serde"] }
@@ -73,7 +73,7 @@ jiff = { version = "0.2", features = ["serde"] }
 ed25519-dalek = { version = "3.0", features = ["pem"] }
 crypto_box = { version = "0.9", features = ["chacha20", "seal", "serde"] }
 spki = { version = "0.8", features = ["pem"] }
-base64 = "0.22"
+base64 = "0.23"
 password-auth = "1.0.0"
 
 # Utoipa
